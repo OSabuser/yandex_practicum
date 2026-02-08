@@ -1,9 +1,0 @@
-[package]
-name = "introduction"
-version = "0.1.0"
-edition = "2024"
-authors.workspace = true
-
-[dependencies]
-log = { workspace = true }
-env_logger = { workspace = true }
