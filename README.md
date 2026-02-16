@@ -60,6 +60,11 @@ cd project
 mkdir project
 cd project
 uv init
+
+# На другом ПК при наличии сгенерированного проекта:
+uv sync
+# С использованием uv.lock файла
+uv sync --locked 
 ```
 
 2. Работа с виртуальным окружением

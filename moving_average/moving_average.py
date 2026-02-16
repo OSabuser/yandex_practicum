@@ -121,4 +121,4 @@ samples_array = [
     3,
 ]
 
-# create_demo_subplots(samples_array)
+create_demo_subplots(samples_array)
