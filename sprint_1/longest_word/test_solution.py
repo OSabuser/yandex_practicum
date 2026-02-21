@@ -1,6 +1,6 @@
 import pytest
 
-from sprint_1.longest_word import get_max_longest_word
+from sprint_1.longest_word.solution import get_max_longest_word
 
 
 @pytest.mark.parametrize(

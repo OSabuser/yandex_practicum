@@ -1,6 +1,6 @@
 import pytest
 
-from sprint_1.func_value import (
+from sprint_1.func_value.solution import (
     get_func_value,
 )
 

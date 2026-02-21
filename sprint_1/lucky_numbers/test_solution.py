@@ -1,6 +1,6 @@
 import pytest
 
-from sprint_1.lucky_numbers import (
+from sprint_1.lucky_numbers.solution import (
     make_decision,
 )
 
@@ -9,23 +9,9 @@ from sprint_1.lucky_numbers import (
     "values,expected",
     [
         ([-8, -5, -2, 7], "ERROR"),
-        (
-            [
-                -8,
-                -5,
-            ],
-            "ERROR",
-        ),
-        (
-            [
-                -5,
-            ],
-            "ERROR",
-        ),
-        (
-            [8, 2, 9],
-            "FAIL",
-        ),
+        ([-8, -5], "ERROR"),
+        ([-5], "ERROR"),
+        ([8, 2, 9], "FAIL"),
         ([2, 4, 6], "WIN"),
         ([0, 0, 0], "WIN"),
         ([0, 1, 0], "FAIL"),

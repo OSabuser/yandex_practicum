@@ -11,7 +11,7 @@
     }
   },
   "python.analysis.ignore": ["*"],
-  "python.analysis.typeCheckingMode": "off",
+  "python.analysis.typeCheckingMode": "standard",
   "python.analysis.inlayHints.variableTypes": true,
   "python.analysis.inlayHints.functionReturnTypes": true,
   "ruff.importStrategy": "fromEnvironment",

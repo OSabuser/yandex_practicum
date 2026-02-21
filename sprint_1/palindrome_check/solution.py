@@ -9,17 +9,15 @@ def get_word():
 def is_word_palindrome(text: str):
 
     text_length = len(text)
-    if text_length == 1:
-        print("To compare:", text[0], text[0])
-        if text[0].isalnum():
-            return True
-        else:
-            return False
 
+    # Если слово состоит из одного символа, то оно не является палиндромом
+    if text_length == 1:
+        return False
+
+    # Инициализируем указатели на первый и последний символ строки
     left_symbol_ptr = 0
     right_symbol_ptr = text_length - 1
 
-    print("Initial pointers:", text[left_symbol_ptr], text[right_symbol_ptr])
 
     while left_symbol_ptr < right_symbol_ptr:
         # Пропускаем все кроме цифр и букв
