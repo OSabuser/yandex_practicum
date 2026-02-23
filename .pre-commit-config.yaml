@@ -68,6 +68,7 @@ default_language_version:
 exclude: |
   (?x)^(
     \.git/|
+    \docs/|
     \.pytest_cache/|
     __pycache__/|
     \.venv/|

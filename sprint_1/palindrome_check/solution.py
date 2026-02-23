@@ -27,7 +27,6 @@ def is_word_palindrome(text: str):
             right_symbol_ptr -= 1
             continue
 
-        print("To compare:", text[left_symbol_ptr], text[right_symbol_ptr])
         # Сюда попадаем, тогда, когда оба указателя указывают на валидный символ
         if text[left_symbol_ptr] != text[right_symbol_ptr]:
             return False
@@ -44,6 +43,6 @@ if __name__ == "__main__":
 
     if word is not None:
         if is_word_palindrome(word):
-            print("TRUE")
+            print("True")
         else:
-            print("FALSE")
+            print("False")

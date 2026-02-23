@@ -1,6 +1,6 @@
 import pytest
 
-from moving_average.moving_average import (
+from sprint_0.moving_average import (
     get_simple_moving_average_enhanced,
     get_simple_moving_average_naive,
 )
