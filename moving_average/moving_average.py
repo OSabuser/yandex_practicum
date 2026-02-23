@@ -52,7 +52,6 @@ def get_simple_moving_average_enhanced(measure_time, values, window_size):
 
 
 def create_demo_subplots(samples_array):
-
     # Создание сетки 3 строки × 3 столбца
     fig, axes = plt.subplots(3, 3)
     # До фильтрации

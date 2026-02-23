@@ -1,18 +1,27 @@
 {
-    "version": "2.0.0",
-    "tasks": [
-        {
-            "label": "Run solution",
-            "type": "shell",
-            "command": "uv run ${file}",
-            "group": {
-                "kind": "build",
-                "isDefault": true
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run Python File (uv)",
+      "type": "shell",
+      "command": "uv run '${file}'",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": true
+      },
+       "options": {
+                "cwd": "${workspaceFolder}",
+                "statusbar": {
+                    "color": "#ff8bd4",
+                    "label": "$(debug-console-view-icon) uv: Run",
+                    "detail": "Run current file"
+                }
             },
-            "presentation": {
-                "reveal": "always",
-                "panel": "shared"
-            }
-        }
-    ]
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    }
+  ]
 }

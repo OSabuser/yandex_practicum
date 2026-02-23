@@ -56,7 +56,6 @@ class Matrix:
 
 
 def get_matrix():
-
     # Количество строк и столбцов в матрице
     rows = int(input())
     columns = int(input())

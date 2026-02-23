@@ -7,7 +7,6 @@ def get_word():
 
 
 def is_word_palindrome(text: str):
-
     text_length = len(text)
 
     # Если слово состоит из одного символа, то оно не является палиндромом
@@ -17,7 +16,6 @@ def is_word_palindrome(text: str):
     # Инициализируем указатели на первый и последний символ строки
     left_symbol_ptr = 0
     right_symbol_ptr = text_length - 1
-
 
     while left_symbol_ptr < right_symbol_ptr:
         # Пропускаем все кроме цифр и букв
