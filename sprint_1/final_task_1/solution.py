@@ -1,32 +1,94 @@
+# ССЫЛКА НА ОТЧЁТ: https://contest.yandex.ru/contest/22450/run-report/157830462/
+# > Основная идея: "пройтись туда-обратно по улице" - сначала от начала улицы до конца,
+# затем в обратном направлении.
+#
+# > При первом проходе будем считать растояния от каждого очередного пустого участка до
+# последующих участков с домами. При втором проходе будем делать аналогично, но в обратную
+# сторону. Фактически получается, что при первом проходе мы посчитаем все растояния
+# от пустых участков до участков справа, пока не встретим следующий пустой участок и
+# отсчет пойдет заново:
+# ...0 S1 S2 S3 0 0 S1 S2 S3 S4 S5 S6 S7 S8 S9 0... - список с расстояниями Sn,
+# n - расстояние до пустого участка слева, для пустого участка расстояние равно 0.
+# Отсчет дистанции начинаем тогда, когда встречаем первый участок с домом после пустого.
+#
+# > При проходе "обратно" считыаем расстояния аналогично. Но изменять значения S в списке будем
+# только если оно меньше, чем то, которое было расчитано ранее:
+# Проходим по списку
+# ...0 S9 S8 S7 S6 S5 S4 S3 S2 S1 0 0 S3 S2 S1 0... (состояние после первого прохода)
+# ...0 (S1<S9) (S2<S8) (S3<S7) (S4<S6) (S5=S5) (S6>S4) (S7>S3) (S8>S2) (S9>S1) 0
+# 0 (S1<S3) (S2=S2) (S3>S1) 0...
+# В итоге имеем список с минимальными расстояниями:
+# 0 S1 S2 S1 0 0 S1 S2 S3 S4 S5 S4 S3 S2 S1 0
+#
+# > Есть один нюансик: что если пустой участок будет не в самом начале, а, к примеру, в конце?
+# Например, задана улица:
+# 55 66 77 1 2 3 4 0
+# Получается, что при первом проходе список с растоянием будет не
+# проинициализирован какими-либо расстояниями?
+# Примем расстояния для участок с домами при первом проходе равными номерам домов,
+# тогда при втором проходе:
+# 0 (S1<S4) (S2<S3) (S3>S2) (S4>S1) (S5<S77) (S6<S66) (S7<S55)
+# Получаем такие минимальные расстояния:
+# S7 S6 S5 [S1 S2] S2 S1 0
+# Элементы выделенные квадратными скобками - некорректные (аналогично сработала бы
+# ситуация когда мы имеем улицу вида 0 a b c d e f.., где a-f.. - номера домов)
+# Получается, что лучше всего инициализировать расстояния от домов, идущих до
+# первого пустого участка каким-то большим числом, которое однозначно
+# будет больше чем любое из потенциально возможных расстояний, например,
+# n - длина всей улицы - подходит, так как есть гарантия, что на улице есть как
+# минимум один пустой участок
+
+
 def get_input_values():
     length_of_street = int(input())
     house_numbers = list(map(int, input().split()))
-    return length_of_street, house_numbers
+
+    if length_of_street != len(house_numbers):
+        raise ValueError("Введенная длина не совпадаетчц с фактической длиной улицы!")
+
+    return house_numbers
 
 
-def get_closest_distances(length, houses):
-    distances = [length + 1] * length
+def get_closest_distances(houses):
+    # Длина улицы
+    length_of_street = len(houses)
 
-    # Записываем индексы незанятых домов (т.н. нули)
-    current_zero = length + 1
-    for house_index in range(length):
+    # Результирующий список расстояний до ближайшего пустого участка
+    distances = [length_of_street] * length_of_street
+
+    distance = 0
+    is_empty_found = False
+    # Проход от первого участка к последнему
+    for house_index in range(length_of_street):
         if houses[house_index] == 0:
-            current_zero = house_index
+            # Нашли пустой участок
+            distances[house_index] = 0
+            # Сбросили дистанцию
+            distance = 0
+            is_empty_found = True
+        elif is_empty_found:
+            # Увеличваем дистанцию, если до этого был найден пустой участок
+            distance += 1
+            distances[house_index] = distance
 
-        distances[house_index] = house_index - current_zero
-
-    print(f"Current distance: {distances}")
-    # Переворачиваем массив и проходимся по нему еще раз в обратную сторону
-    current_zero = length + 1
-    for house_index in range(length - 1, -1, -1):
+    distance = 0
+    is_empty_found = False
+    for house_index in range(length_of_street - 1, -1, -1):
         if houses[house_index] == 0:
-            current_zero = house_index
-        print(f"{current_zero - house_index} или {distances[house_index]}")
+            # Все пустые участки на этом моменте уже известны
+            distance = 0
+            is_empty_found = True
+        elif is_empty_found:
+            distance += 1
+            # Смотрим, какая дистанция меньше
+            # Её и ставим или оставляем с первого прохода
+            if distance < distances[house_index]:
+                distances[house_index] = distance
 
     return distances
 
 
 if __name__ == "__main__":
-    length_of_street, house_numbers = get_input_values()
+    house_numbers = get_input_values()
 
-    print(*get_closest_distances(length_of_street, house_numbers))
+    print(*get_closest_distances(house_numbers))
