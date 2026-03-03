@@ -1,7 +1,10 @@
 {
   "python.defaultInterpreterPath": "${workspaceFolder}.venv/bin/python",
   "python.analysis.extraPaths": ["${workspaceFolder}.venv/lib/python3.13/site-packages"],
-
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit",
+    "source.fixAll.ruff": "always"
+  },
   "[python]": {
     "editor.defaultFormatter": "charliermarsh.ruff",
     "editor.formatOnSave": true,
