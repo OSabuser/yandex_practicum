@@ -5,29 +5,18 @@ LOCAL = os.environ.get("REMOTE_JUDGE", "false") != "true"
 if LOCAL:
 
     class Node:
-        # Длина связного списка (предполагается что список может существовать
-        # в единственном экземпляре)
-        __list_length: int = 0
-
         def __init__(self, value, next_item=None):
             self.value = value
             self.next_item = next_item
-            Node.__list_length += 1
-
-        def __del__(self):
-            Node.__list_length -= 1
-
-        @classmethod
-        def get_list_length(cls) -> int:
-            return cls.__list_length
 
 
-# Отображение значений всех узлов списка, влоть до последнего
-def solution(node):
-    while node:
-        data = get_node_value(node)
-        print(data)
-        node = node.next_item
+def get_node_by_index(head, index):
+    while index:
+        if head is None:
+            break
+        head = head.next_item
+        index -= 1
+    return head
 
 
 # Получить значение узла ${node}
@@ -36,22 +25,35 @@ def get_node_value(node):
         return node.value
 
 
+def get_index_by_value(head, value):
+    index = 0
+    while head is not None:
+        node_value = get_node_value(head)
+        if node_value is not None:
+            if node_value == value:
+                return index
+
+        head = head.next_item
+        index += 1
+
+    return -1
+
+
+def solution(node, elem):
+    return get_index_by_value(node, elem)
+
+
 def test():
     node3 = Node("node3", None)
-    print(f"List's length: {Node.get_list_length()}")
     node2 = Node("node2", node3)
-    print(f"List's length: {Node.get_list_length()}")
     node1 = Node("node1", node2)
-    print(f"List's length: {Node.get_list_length()}")
     node0 = Node("node0", node1)
-    print(f"List's length: {Node.get_list_length()}")
-    solution(node0)
-    print()
-    # Output is:
-    # node0
-    # node1
-    # node2
-    # node3
+
+    idx = solution(node0, "node2")
+    assert idx == 2
+
+    idx = solution(node0, "node21")
+    assert idx == -1
 
 
 if __name__ == "__main__":

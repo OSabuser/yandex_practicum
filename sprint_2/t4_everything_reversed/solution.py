@@ -4,54 +4,54 @@ LOCAL = os.environ.get("REMOTE_JUDGE", "false") != "true"
 
 if LOCAL:
 
-    class Node:
-        # Длина связного списка (предполагается что список может существовать
-        # в единственном экземпляре)
-        __list_length: int = 0
-
-        def __init__(self, value, next_item=None):
+    class DoubleConnectedNode:
+        def __init__(self, value, next=None, prev=None):
             self.value = value
-            self.next_item = next_item
-            Node.__list_length += 1
-
-        def __del__(self):
-            Node.__list_length -= 1
-
-        @classmethod
-        def get_list_length(cls) -> int:
-            return cls.__list_length
+            self.next = next
+            self.prev = prev
 
 
-# Отображение значений всех узлов списка, влоть до последнего
+def get_reversed_linked_list(head):
+    # Проход по всему списку вплоть до tail
+    while head is not None:
+        temp = head.next
+        head.next = head.prev
+        head.prev = temp
+
+        if head.prev is None:
+            # Нашли tail, он станет новой головой списка
+            return head
+
+        head = head.prev
+
+
 def solution(node):
-    while node:
-        data = get_node_value(node)
-        print(data)
-        node = node.next_item
-
-
-# Получить значение узла ${node}
-def get_node_value(node):
-    if node is not None:
-        return node.value
+    return get_reversed_linked_list(node)
 
 
 def test():
-    node3 = Node("node3", None)
-    print(f"List's length: {Node.get_list_length()}")
-    node2 = Node("node2", node3)
-    print(f"List's length: {Node.get_list_length()}")
-    node1 = Node("node1", node2)
-    print(f"List's length: {Node.get_list_length()}")
-    node0 = Node("node0", node1)
-    print(f"List's length: {Node.get_list_length()}")
-    solution(node0)
-    print()
-    # Output is:
-    # node0
-    # node1
-    # node2
-    # node3
+    node3 = DoubleConnectedNode("node3")
+    node2 = DoubleConnectedNode("node2")
+    node1 = DoubleConnectedNode("node1")
+    node0 = DoubleConnectedNode("node0")
+
+    node0.next = node1
+
+    node1.prev = node0
+    node1.next = node2
+
+    node2.prev = node1
+    node2.next = node3
+
+    node3.prev = node2
+    new_head = solution(node0)
+    assert new_head is node3
+    assert node3.next is node2
+    assert node2.next is node1
+    assert node2.prev is node3
+    assert node1.next is node0
+    assert node1.prev is node2
+    assert node0.prev is node1
 
 
 if __name__ == "__main__":
