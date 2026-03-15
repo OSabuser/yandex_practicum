@@ -38,9 +38,6 @@ repos:
       - id: check-toml
         name: "Проверка TOML файлов"
 
-      # Удаление trailing whitespace
-      - id: trailing-whitespace
-        name: "Удаление пробелов в конце строк"
 
       # Проверка что файлы заканчиваются переводом строки
       - id: end-of-file-fixer
