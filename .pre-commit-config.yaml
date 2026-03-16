@@ -38,11 +38,6 @@ repos:
       - id: check-toml
         name: "Проверка TOML файлов"
 
-
-      # Проверка что файлы заканчиваются переводом строки
-      - id: end-of-file-fixer
-        name: "Добавление переноса строки в конец файла"
-
       # Проверка на большие файлы (>500KB)
       - id: check-added-large-files
         args: ['--maxkb=500']
