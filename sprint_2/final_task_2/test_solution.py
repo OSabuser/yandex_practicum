@@ -15,8 +15,12 @@ from sprint_2.final_task_2.solution import MyDumbCalculator
             [False, False, False, True],
         ),
         (
-            ["0", "-0", "4-", "5"],
-            [True, True, False, True],
+            ["0", "-0", "4-", "="],
+            [True, True, False, False],
+        ),
+        (
+            ["==", "++", "-_", ";"],
+            [False, False, False, False],
         ),
     ],
 )
@@ -34,7 +38,7 @@ def test_is_valid_operand(numbers, expected):
             [True, True, True, True],
         ),
         (
-            ["=", "++", "-_", ";"],
+            ["1", "2", "3", "4"],
             [False, False, False, False],
         ),
     ],

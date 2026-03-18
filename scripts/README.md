@@ -1,14 +1,5 @@
 # 🚀 Commit & Push с pre-commit хуками
 
-## Установка
-
-```bash
-# Положить файлы в проект
-cp Justfile ./
-cp scripts/commit_push.sh ./scripts/
-chmod +x scripts/commit_push.sh
-```
-
 ## Команды
 
 | Команда | Описание |
