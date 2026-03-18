@@ -1,5 +1,25 @@
 # ССЫЛКА НА ОТЧЁТ: https://contest.yandex.ru/contest/22781/run-report/158610375/
-# > Основная идея:
+# 1. Принцип работы Deque
+# > Дека построена на кольцевом буфере. Операции извлечения и добавления элементов
+# из/в начало/конец деки работают с использованием указателей head,`tail. `push_back`,
+# `pop_front` работают также, как и в обычной очереди на кольцевом буфере: при
+# добавлении элемента в конец очереди `tail` увеличивается на единицу, при извлечении
+# элемента из начала - двигаем указатель head на единицу вперед. `push_front`,`pop_back`
+# работают аналогично, но в обратную сторону: при добавлении элемента в начало очереди
+# перемещается  head на единицу назад, при извлечении элемента из конца очереди -
+# двигаем назад tail.
+# 2. Доказательство корректности
+# >
+# 3. Временная сложность
+# >
+# 4. Пространственная сложность
+# >
+#
+#
+#
+#
+#
+# //FIXME: надо исправить в соответствии с шаблоном
 # В целом, в задаче "Ограниченная очередь" мы уже реализовали обычную очередь на кольцевом буфере
 # Бонусом из этой задачи мы получаем реализованные методы: push_back(val) & pop_front без
 # модификаиций. Эти методы в общем-то и реализуют основной интерфейс для обычной очереди на
@@ -40,8 +60,7 @@ class MyDequeueSized:
     def push_back(self, item):
         """Добавление элемента ${item} в конец очереди"""
         if self.__queue_size == self.__max_length:
-            # Очередь заполнена
-            return None
+            raise ValueError("Очередь переполнена!")
 
         # Добавляем элемент в конец очереди
         self.__queue[self.__tail] = item
@@ -53,8 +72,7 @@ class MyDequeueSized:
     def push_front(self, item):
         """Добавление элемента ${item} в начало очереди"""
         if self.__queue_size == self.__max_length:
-            # Очередь заполнена
-            return None
+            raise ValueError("Очередь переполнена!")
 
         # Смещаем сначала указатель head на следующую позицию слева
         # Старый элемент на который указывал head, не трогаем
@@ -66,8 +84,7 @@ class MyDequeueSized:
     def pop_back(self):
         """Убрать элемент из конца очереди и вернуть его вызывающей стороне"""
         if self.__queue_size == 0:
-            # Очередь пуста
-            return None
+            raise ValueError("Пустая очередь!")
 
         # Смещаем сначала указатель tail на следующую позицию слева
         # При следующих вставках front, будем использовать его
@@ -81,8 +98,7 @@ class MyDequeueSized:
     def pop_front(self):
         """Убрать элемент из начала очереди и вернуть его вызывающей стороне"""
         if self.__queue_size == 0:
-            # Очередь пуста
-            return None
+            raise ValueError("Пустая очередь!")
 
         element = self.__queue[self.__head]
         self.__queue[self.__head] = None
@@ -104,17 +120,26 @@ class MyDequeueSized:
         command, *args = command.split()
         match command:
             case "push_front":
-                result = self.push_front(int(args[0]))
-                command_output = "error" if result is None else None
+                try:
+                    self.push_front(int(args[0]))
+                except ValueError:
+                    command_output = "error"
             case "push_back":
-                result = self.push_back(int(args[0]))
-                command_output = "error" if result is None else None
+                try:
+                    self.push_back(int(args[0]))
+                except ValueError:
+                    command_output = "error"
             case "pop_front":
-                result = self.pop_front()
-                command_output = "error" if result is None else result
+                try:
+                    command_output = self.pop_front()
+                except ValueError:
+                    command_output = "error"
+
             case "pop_back":
-                result = self.pop_back()
-                command_output = "error" if result is None else result
+                try:
+                    command_output = self.pop_back()
+                except ValueError:
+                    command_output = "error"
 
         return command_output
 
