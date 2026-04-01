@@ -1,4 +1,4 @@
-# ССЫЛКА НА ОТЧЁТ: https://contest.yandex.ru/contest/23815/run-report/159555645/
+# ССЫЛКА НА ОТЧЁТ: https://contest.yandex.ru/contest/23815/run-report/159687129/
 #
 #
 # 1. Принцип работы быстрой сортировки in-place
@@ -23,9 +23,9 @@
 #   т.е. когда выполнится условие left_ptr >= right_ptr. Новых подмассивов здесь не создается,
 #   работаем in-place с тем массивом, для которого осуществляем разделение.
 #
-#   При проходе по элементам массива используем кастомный компаратор `timofeys_sorting_rule`,
-#   используя обертки `goes_before(a, b)` -> True, если a идёт раньше b, и False в противном случае
-#   и `goes_after(a, b)` -> True, если a идёт после b, и False в противном случае
+#   При проходе по элементам массива используем обычный оператор сравнения "<",
+#   при этом реализуя для класса Trainee dunder-метод __lt__(self, other), который
+#   реализует кастомную логику сравнения участников, придуманную Тимофеем.
 #   В результате мы получаем индекс разделения исходного массива на подмассивы:
 #   - элементы, с индексами <= индекса разделения, не идут после pivot элемента;
 #   - элементы, с индексами > (индекса разделения + 1), не идут до pivot элемента.
@@ -38,25 +38,24 @@
 #
 # 2. Доказательство корректности
 #
-# A. Компаратор timofeys_sorting_rule задаёт строгий порядок для участников,
+# A. Реализация dunder-метода __lt__ для класса Trainee задаёт строгий порядок для участников.
 # для двух участников trainee_1, trainee_2:
 # - либо trainee_1 идет раньше trainee_2
 # - либо trainee_2 идет раньше trainee_1
 # Эти два условия взаимоисключающие.
-# Т.е  goes_before(a, b) и goes_before(a, b) не могут быть True одновременно.
 #
 # Б. Смотрел здесь
 # https://neerc.ifmo.ru/wiki/index.php?title=Быстрая_сортировка и
 # https://www.geeksforgeeks.org/dsa/hoare-s-partition-algorithm/
-# В процессе разделения с учетом "строгости" компаратора выполняется:
+# В процессе разделения с учетом "строгости" реализации __lt__  выполняется:
 #   1 Все элементы с индексами < left_ptr не идут после pivot элемента,
-#   для них goes_after(traineesi, pivot_trainee) - False
+#   для них input_array[left_ptr] < pivot_element - False
 #   2 Все элементы с индексами > right_ptr не идут до pivot элемента,
-#   для них goes_before(trainees, pivot_trainee)  - False
+#   для них pivot_element < input_array[right_ptr]  - False
 #   3 элементы между left_ptr и right_ptr пока не просмотрены
 #   В конечном счете, все оставшиеся элементы между left_ptr и right_ptr
-#   будут свапнуты если для них не выполняются условия 1/2. Учитывая строгость компаратора,
-#   (cм. 2 условия в пункте A)после операции swap, элементы займут правильные места.
+#   будут свапнуты, если для них не выполняются условия 1/2. Учитывая строгость сравнения,
+#   (cм. 2 условия в пункте A) после операции swap, элементы займут правильные места.
 #
 # В. Корректность рекурсии обеспечивается тем, что после осуществления разделения исходного массива
 # мы получаем два подмассива длина которых будет меньше чем длина исходного и в конечном счете
@@ -94,57 +93,45 @@ class Trainee:
         self.solved = solved
         self.penalty = penalty
 
+    def __lt__(self, other):
+        """
+        Правило сравнения: при сравнении двух участников выше будет идти тот,
+        у которого решено больше задач. При равенстве числа решённых задач первым идёт участник
+        с меньшим штрафом. Если же и штрафы совпадают, то первым будет тот, у которого логин
+        идёт раньше в алфавитном (лексикографическом) порядке.
+        """
+        if not isinstance(other, Trainee):
+            raise TypeError
 
-def timofeys_sorting_rule(trainee_1, trainee_2):
-    """
-    Правило сортировки: при сравнении двух участников выше будет  идти тот,
-    у которого решено больше задач. При равенстве числа решённых задач первым идёт участник
-    с меньшим штрафом. Если же и штрафы совпадают, то первым будет тот, у которого логин
-    идёт раньше в алфавитном (лексикографическом) порядке.
-    """
-    # Больше решено
-    if trainee_1.solved != trainee_2.solved:
-        return trainee_1.solved > trainee_2.solved
-
-    # Меньше штраф
-    if trainee_1.penalty != trainee_2.penalty:
-        return trainee_1.penalty < trainee_2.penalty
-
-    # Лексикографический порядок раньше (буквы у нас все в нижнем регистре)
-    return trainee_1.login < trainee_2.login
-
-
-def goes_before(a, b):
-    # a идёт раньше b
-    return timofeys_sorting_rule(a, b)
+        # Больше решено
+        if self.solved != other.solved:
+            return self.solved > other.solved
+        # Меньше штраф
+        if self.penalty != other.penalty:
+            return self.penalty < other.penalty
+        # Лексикографический порядок раньше (буквы у нас все в нижнем регистре)
+        return self.login < other.login
 
 
-def goes_after(a, b):
-    # a идёт после b
-    return timofeys_sorting_rule(b, a)
-
-
-def partition_in_place(trainees, left_border, right_border):
+def partition_in_place(input_array, left_border, right_border):
     """
     Тут реализуем схему Хоара алгоритма разбиения
     """
-    # Хороший вопрос - какого стажёра выбрать в качестве опорного
+    # Хороший вопрос - какой элемент выбрать в качестве опорного
     # Предоставим это воле случая
-    pivot_trainee = trainees[random.randint(left_border, right_border)]
+    pivot_element = input_array[random.randint(left_border, right_border)]
     left_ptr = left_border
     right_ptr = right_border
 
     while True:
-        # Осуществляем свдиг указателей до того момента,
-        # пока результаты очередного стажёра не cтанут хуже чем
-        # результаты стажёра, выбранного опорным
-        while goes_before(trainees[left_ptr], pivot_trainee):
+        # Осуществляем свдиг указателя до того момента,
+        # пока он указывает на элемент меньше опорного
+        while input_array[left_ptr] < pivot_element:
             left_ptr += 1
 
-        # Осуществляем свдиг указателей до того момента,
-        # пока результаты очередного стажёра не cтанут лучше чем
-        # результаты стажёра, выбранного опорным
-        while goes_after(trainees[right_ptr], pivot_trainee):
+        # Осуществляем свдиг указателя до того момента,
+        # пока он указывает на элемент превосходящий опорный
+        while pivot_element < input_array[right_ptr]:
             right_ptr -= 1
 
         # Если указатели встретились, заканчиваем
@@ -152,27 +139,31 @@ def partition_in_place(trainees, left_border, right_border):
             return right_ptr  # индекс разделения
 
         # Меняем местами элементы, имеющие неправильный порядок
-        trainees[left_ptr], trainees[right_ptr] = trainees[right_ptr], trainees[left_ptr]
+        input_array[left_ptr], input_array[right_ptr] = (
+            input_array[right_ptr],
+            input_array[left_ptr],
+        )
+
         left_ptr += 1
         right_ptr -= 1
 
 
-def enhanced_quicksort(trainees, left_border, right_border):
+def enhanced_quicksort(input_array, left_border, right_border):
     # Базовый случай: если массив пуст или содержит один элемент
     # Он считается отсортированным
     if left_border >= right_border:
-        return trainees
+        return input_array
 
-    partition_idx = partition_in_place(trainees, left_border, right_border)
+    partition_idx = partition_in_place(input_array, left_border, right_border)
     # Все элементы с индексами <= partition_idx: по порядку расположены не после pivot элемента
     # Все элементы с индексами >= partition_idx + 1: по порядку расположены не до pivot элемента
     # Рекурсивный случай:
     # 1. Сортируем левую половину (<= partition_idx) рекурсивно
     # 2. Сортируем правую половину (>= partition_idx + 1) рекурсивно
-    enhanced_quicksort(trainees, left_border, partition_idx)
-    enhanced_quicksort(trainees, partition_idx + 1, right_border)
+    enhanced_quicksort(input_array, left_border, partition_idx)
+    enhanced_quicksort(input_array, partition_idx + 1, right_border)
 
-    return trainees
+    return input_array
 
 
 def get_trainees_data():
