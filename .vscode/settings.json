@@ -20,7 +20,7 @@
   "ruff.importStrategy": "fromEnvironment",
   "ruff.interpreter": ["${workspaceFolder}/.venv/bin/python"],
   "ruff.configuration": "${workspaceFolder}/pyproject.toml",
-
+  "errorLens.enabled": true,
   "python.testing.pytestArgs": ["."],
   "python.testing.unittestEnabled": false,
   "python.testing.pytestEnabled": true
