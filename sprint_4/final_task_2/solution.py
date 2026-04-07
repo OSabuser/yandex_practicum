@@ -3,16 +3,7 @@
 # 1. Дизайн и принцип работы MyReinventedTable
 #
 # > По условию задачи все ключи - целые числа, как отрицательные, так и положительные.
-# По сему выбор структуры данных - хэш-таблицы более чем оправдан.
-#
-# - Для вычисления номеров корзин в таблице используется метод деления.
-# Данный метод прекрасно работает, как с положительными, так и с отрицательными
-# целочисленными ключами, так же он достаточно прост в реализации; индексная функция
-# должна вычислять выражение `hash(key) mod M`, где key - ключ, M - количество корзин,
-# а hash - выбранная хэш-функция. С учётом того, что ключи могут быть отрицательными,
-# для однозначного вычисления операции деления с остатком используется математическое
-# определение целого числа: `k = j*M + r`, причем `r∈[0, M)` является отстатком от деления
-# `k` на `M` и служит номером корзины таблицы длиной `M`.
+# По сему выбор структуры данных - хэш-таблицы более чем оправдан для её решения.
 #
 # > Так же по условию задано максимальное предполагаемое количество ключей в таблице - N=10^5.
 #
@@ -32,9 +23,47 @@
 # ключах, было принято решение обезопаситься от непредвиденных ситуаций путём использования
 # нетождественной! хэш-функции, обеспечивающей равномерное распределение ключей по всем корзинам.
 # Такая функция также должна быстро вычисляться быстро, выдавать значения в ограниченном диапазоне,
-# и возвращать одно и то же значение для одного и того же ключа.
+# и возвращать одно и то же значение для одного и того же ключа. Взял за основу 6-шаговый хэш
+# имени господина Дженкинса: https://burtleburtle.net/bob/hash/integer.html - вычисляется за O(1)
+#
+# - Для вычисления номеров корзин в таблице используется метод деления.
+# Данный метод прекрасно работает, как с положительными, так и с отрицательными
+# целочисленными ключами, так же он достаточно прост в реализации; индексная функция
+# должна вычислять выражение `hash(key) mod M`, где key - ключ, M - количество корзин,
+# а hash - выбранная хэш-функция.
 #
 # 2. Доказательство корректности
+#
+# > Корректность хэш-функции:
+# - Для одного и того же ключа возвращает одно и тоже значение, так как над ключом
+# совершается фиксированная последовательность битовых операций
+# - Результат выполения хэш-функции ограничен значением UINT32_MAX (все операции над ключом
+# в хэш функции маскируются)
+# - Функция вычисляется достаточно эффективно и быстро за О(1)
+#
+# > Корректность индексной функции:
+# - Получаемый индекс всегда является корректным за счет операции деления по модулю
+# _TABLE_SIZE, т.е. индекс лежит в диапазоне [0, _TABLE_SIZE)
+# - Для любого ключа индексная функция вычисляет один и тот же индекс корзины
+# - Для одного и того же ключа, индекс всегда одинаковый (операция хеширования и деления
+# по модулю детерминированные)
+#
+# > Корректность разрешения коллизий:
+# Обеспечивается за счет применения метода цепочек. Каждый очередной ключ, для которого
+# индексная функция вычисляет одинаковый индекс корзины, будет добавлен в начало связного списка
+# LinkedList, который в этой корзине расположен. Теперь для получения значения по ключу в случае
+# когда искомый элемент лежит в корзине не один, мы просто будем проходить по связному
+# списку - цепочке линейно в заданной корзине в поисках искомой пары ключ-значение.
+#
+# > Корректность таблицы MyReinventedTable
+# - put(key, value) всегда кладет пару в предсказуемую корзину (индекс функция и хеш функция
+# детерминированные)
+# - remove(key) удаляет элемент из определенной корзины (ее номер будет такой же как и
+# номер корзины, вычисленный для операции put(key, value), если такая операция проводилась
+# до удаления; иначе, если элемент отсутствует в корзине мы получим None).
+# - get(key) возвращает значение элемента из определенной корзины (ее номер будет такой же как и
+# номер корзины, вычисленный для операции put(key, value), если такая операция проводилась
+# до; иначе, если элемент отсутствует в корзине мы получим None).
 #
 #
 # 3. Временная сложность
@@ -45,32 +74,137 @@
 #
 
 
+class ListNode:
+    """Узел связного списка, хранящий пару (ключ, значение)."""
+
+    def __init__(self, key, value, next_item=None):
+        self.key = key
+        self.value = value
+        self.next = next_item
+
+
+class LinkedList:
+    """
+    Связный список, хранящий узлы типа ListNode.
+    Представляет собой отдельную цепочку в корзине хэш-таблицы.
+    """
+
+    def __init__(self):
+        self.head = None
+
+    def get(self, key):
+        """Получение значения элемента в цепочке по ключу"""
+        current = self.head
+        while current is not None:
+            if current.key == key:
+                return current.value
+            current = current.next
+        return None
+
+    def put(self, key, value):
+        """
+        Добавление нового элемента в начало цепочки, или
+        обновление уже существующего.
+        """
+        current = self.head
+
+        while current is not None:
+            if current.key == key:
+                # Обновление существующего элемента в цепочке
+                current.value = value
+                return
+            current = current.next
+
+        # Новый элемент добавляем в начало цепочки
+        self.head = ListNode(key, value, self.head)
+
+    def remove(self, key):
+        """Удаление элемента из цепочки по ключу с возвращением его значения"""
+        prev = None
+        current = self.head
+
+        while current is not None:
+            if current.key == key:
+                # Возвращаем элемент и удаляем его из цепочки
+                if prev is None:
+                    self.head = current.next
+                else:
+                    prev.next = current.next
+                return current.value
+            prev = current
+            current = current.next
+
+        return None
+
+
+def jenkins_int32_hash(k: int) -> int:
+    """
+    6-шаговый 32-битный хеш Дженкинса для целого ключа.
+    Принимает произвольный int (в т.ч. отрицательный),
+    хеширует по нижним 32 битам и возвращает значение 0..2**32-1.
+    """
+    UINT32_MASK = 0xFFFFFFFF
+
+    a = k & UINT32_MASK  # эквивалент (uint32_t)k
+
+    a = (a + 0x7ED55D16 + ((a << 12) & UINT32_MASK)) & UINT32_MASK
+    a = (a ^ 0xC761C23C ^ (a >> 19)) & UINT32_MASK
+    a = (a + 0x165667B1 + ((a << 5) & UINT32_MASK)) & UINT32_MASK
+    a = (a + 0xD3A2646C) & UINT32_MASK
+    a = (a ^ ((a << 9) & UINT32_MASK)) & UINT32_MASK
+    a = (a + 0xFD7046C5 + ((a << 3) & UINT32_MASK)) & UINT32_MASK
+    a = (a ^ 0xB55A4F09 ^ (a >> 16)) & UINT32_MASK
+
+    return a
+
+
 class MyReinventedTable:
-    pass
+    """
+    Переизобретённая вновь хэш-таблица.
+    Ключи: целые числа (отрицательные и положительные).
+    Кол-во корзин фиксировано: _TABLE_SIZE.
+    """
 
+    _TABLE_SIZE = 125003
 
-def run_user_command(command: str):
-    """Выполнение пользовательской командой над HashTable"""
-    command_output = None
-    command, *args = command.split()
-    match command:
-        case "put":
-            try:
-                print(f"KV to insert: {args[0]}:{args[1]}")
-            except ValueError:
-                command_output = "error"
-        case "get":
-            try:
-                print(f"Key to get: {args[0]}")
-            except ValueError:
-                command_output = "error"
-        case "delete":
-            try:
-                print(f"Key to delete: {args[0]}")
-            except ValueError:
-                command_output = "error"
+    def __init__(self, hash_func=jenkins_int32_hash):
+        self.buckets = [LinkedList() for _ in range(self._TABLE_SIZE)]
+        self._hash_func = hash_func
 
-    return command_output
+    def _get_bucket_index(self, key):
+        """Вычисление номера корзины c помощью метода деления"""
+        return self._hash_func(key) % self._TABLE_SIZE
+
+    def put(self, key, value):
+        """Добавление пары (ключ, значение) в хэш-таблицу"""
+        bucket_index = self._get_bucket_index(key)
+        self.buckets[bucket_index].put(key, value)
+
+    def get(self, key):
+        """Получение значения элемента в хэш-таблице по ключу"""
+        bucket_index = self._get_bucket_index(key)
+        return self.buckets[bucket_index].get(key)
+
+    def remove(self, key):
+        """Удаление элемента из хэш-таблицы по ключу с возвращением его значения"""
+        bucket_index = self._get_bucket_index(key)
+        return self.buckets[bucket_index].remove(key)
+
+    def run_user_command(self, command: str):
+        """Выполнение пользовательской команды над MyReinventedTable"""
+        command_output = None
+        command, *args = command.split()
+        match command:
+            case "put":
+                command_output = self.put(int(args[0]), int(args[1]))
+            case "get":
+                retval = self.get(int(args[0]))
+                command_output = "None" if retval is None else retval
+            case "delete":
+                retval = self.remove(int(args[0]))
+                command_output = "None" if retval is None else retval
+
+        return command_output
 
 
 def get_user_commands():
@@ -85,5 +219,8 @@ def get_user_commands():
 
 if __name__ == "__main__":
     commands = get_user_commands()
+    employee_table = MyReinventedTable()
     for command in commands:
-        run_user_command(command)
+        result = employee_table.run_user_command(command)
+        if result is not None:
+            print(result)
