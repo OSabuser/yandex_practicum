@@ -1,4 +1,4 @@
-# ССЫЛКА НА ОТЧЁТ: https://contest.yandex.ru/contest/24414/run-report/160060222/
+# ССЫЛКА НА ОТЧЁТ:https://contest.yandex.ru/contest/24414/run-report/160187419/
 #
 # 1. Дизайн и принцип работы MyReinventedTable
 #
@@ -213,35 +213,30 @@ class MyReinventedTable:
 
     def run_user_command(self, command: str):
         """Выполнение пользовательской команды над MyReinventedTable"""
-        command_output = None
+        command_output = "Empty"
         command, *args = command.split()
         match command:
             case "put":
-                command_output = self.put(int(args[0]), int(args[1]))
+                self.put(int(args[0]), int(args[1]))
             case "get":
-                retval = self.get(int(args[0]))
-                command_output = "None" if retval is None else retval
+                command_output = self.get(int(args[0]))
             case "delete":
-                retval = self.remove(int(args[0]))
-                command_output = "None" if retval is None else retval
+                command_output = self.remove(int(args[0]))
 
         return command_output
 
 
-def get_user_commands():
-    """Получение  набора пользовательских команд"""
-    number_of_commands = int(input())
-
-    commands = []
-    for _ in range(number_of_commands):
-        commands.append(input())
-    return commands
+def get_number_of_commands():
+    """Получение количества пользовательских команд"""
+    return int(input())
 
 
 if __name__ == "__main__":
-    commands = get_user_commands()
+    commands_cnt = get_number_of_commands()
     employee_table = MyReinventedTable()
-    for command in commands:
+
+    for _ in range(commands_cnt):
+        command = input()
         result = employee_table.run_user_command(command)
-        if result is not None:
+        if result != "Empty":
             print(result)
