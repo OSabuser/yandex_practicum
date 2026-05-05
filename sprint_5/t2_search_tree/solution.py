@@ -11,21 +11,22 @@ if LOCAL:
             self.left = left
 
 
-def solution(root) -> int:
-    if root is None:
-        return float("-inf")
-
-    left_max = solution(root.left)
-    right_max = solution(root.right)
-    return max(root.value, left_max, right_max)
+def solution(root) -> bool:
+    #  Your code
+    #  “ヽ(´▽｀)ノ”
+    pass
 
 
 def test():
-    node1 = Node(1)
-    node2 = Node(-5)
+    node1 = Node(1, None, None)
+    node2 = Node(4, None, None)
     node3 = Node(3, node1, node2)
-    node4 = Node(2, node3, None)
-    assert solution(node4) == 3
+    node4 = Node(8, None, None)
+    node5 = Node(5, node3, node4)
+
+    assert solution(node5)
+    node2.value = 5
+    assert not solution(node5)
 
 
 if __name__ == "__main__":

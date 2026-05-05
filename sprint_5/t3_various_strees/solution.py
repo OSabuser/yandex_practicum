@@ -12,12 +12,9 @@ if LOCAL:
 
 
 def solution(root) -> int:
-    if root is None:
-        return float("-inf")
-
-    left_max = solution(root.left)
-    right_max = solution(root.right)
-    return max(root.value, left_max, right_max)
+    #  Your code
+    #  “ヽ(´▽｀)ノ”
+    pass
 
 
 def test():
