@@ -25,7 +25,7 @@ def test():
     node2 = Node(-5)
     node3 = Node(3, node1, node2)
     node4 = Node(2, node3, None)
-    assert solution(node4) == 3
+    assert solution(node4) == 34
 
 
 if __name__ == "__main__":
