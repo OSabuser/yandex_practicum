@@ -11,10 +11,35 @@ if LOCAL:
             self.left = left
 
 
+# Центрированный обход дерева: LMR
+def is_tree_valid(root):
+    """Проверяет, является ли дерево бинарным деревом поиска."""
+    state = {"is_valid": True, "prev_value": None}
+
+    def inorder_validate(root):
+        if root is None or not state["is_valid"]:
+            return
+
+        # Left - обрабатываем левое поддерево
+        inorder_validate(root.left)
+
+        # Middle - проверяем текущий узел
+        if state["prev_value"] is not None and root.value <= state["prev_value"]:
+            state["is_valid"] = False
+            return
+
+        state["prev_value"] = root.value
+
+        # Right - обрабатываем правое поддерево
+        inorder_validate(root.right)
+
+    inorder_validate(root)
+
+    return state["is_valid"]
+
+
 def solution(root) -> bool:
-    #  Your code
-    #  “ヽ(´▽｀)ノ”
-    pass
+    return is_tree_valid(root)
 
 
 def test():
