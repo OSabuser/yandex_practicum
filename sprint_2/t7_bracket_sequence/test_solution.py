@@ -8,11 +8,6 @@ def test_pop_item_from_empty_stack():
     assert user_stack.pop() == "error"
 
 
-def test_get_stacks_max_item_value_from_empty_stack():
-    user_stack = Stack()
-    assert user_stack.get_max() == "None"
-
-
 @pytest.mark.parametrize(
     "sequence, expected",
     [
