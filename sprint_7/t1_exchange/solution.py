@@ -1,32 +1,34 @@
-import os
-
-LOCAL = os.environ.get("REMOTE_JUDGE", "false") != "true"
-
-if LOCAL:
-
-    class Node:
-        def __init__(self, value, left=None, right=None):
-            self.value = value
-            self.right = right
-            self.left = left
 
 
-def solution(root) -> int:
-    if root is None:
-        return float("-inf")
+def get_input() -> list[int]:
+    """Считывает входные данные: количество дней и массив цен."""
+    _n = int(input())
 
-    left_max = solution(root.left)
-    right_max = solution(root.right)
-    return max(root.value, left_max, right_max)
+    prices = list(map(int, input().split()))
+    return prices
 
 
-def test():
-    node1 = Node(1)
-    node2 = Node(-5)
-    node3 = Node(3, node1, node2)
-    node4 = Node(2, node3, None)
-    assert solution(node4) == 34
+def calculate_max_profit(prices: list[int]) -> int:
+    """
+    Жадный алгоритм: суммируем все положительные дельты
+    между ценами завтрашнего и сегодняшнего дня.
+    """
+    if len(prices) < 2:
+        return 0
+
+    max_profit = 0
+    # Проходим по массиву и собираем всю разницу на восходящих трендах
+    for i in range(1, len(prices)):
+        if prices[i] > prices[i - 1]:
+            max_profit += prices[i] - prices[i - 1]
+
+    return max_profit
 
 
 if __name__ == "__main__":
-    test()
+    # Читаем данные
+    prices = get_input()
+
+    # Считаем и выводим результат
+    result = calculate_max_profit(prices)
+    print(result)
