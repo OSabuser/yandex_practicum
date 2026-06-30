@@ -25,7 +25,7 @@ def solve_schedule(lessons: list[tuple[float, float, str, str]]) -> list[tuple[s
     lessons.sort(key=lambda x: (x[1], x[0]))
 
     result = []
-    last_end = -1.0 # Время начала/конца всегда >= 0
+    last_end = -1.0  # Время начала/конца всегда >= 0
 
     for start_f, end_f, start_str, end_str in lessons:
         # Если урок начинается не раньше, чем закончился предыдущий - берем его

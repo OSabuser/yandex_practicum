@@ -14,7 +14,7 @@ def solve_atm(x: int, coins: list[int]) -> int:
     unique_coins = set(coins)
 
     # Инициализируем массив DP бесконечностью
-    dp = [float('inf')] * (x + 1)
+    dp = [float("inf")] * (x + 1)
     dp[0] = 0  # Для суммы 0 нужно 0 купюр
 
     # Проходим по каждому уникальному номиналу
@@ -22,11 +22,11 @@ def solve_atm(x: int, coins: list[int]) -> int:
         # Обновляем значения DP только для сумм, куда эта купюра влезает
         for i in range(coin, x + 1):
             # Если сумму i - coin можно собрать, пробуем собрать i
-            if dp[i - coin] != float('inf'):
+            if dp[i - coin] != float("inf"):
                 dp[i] = min(dp[i], dp[i - coin] + 1)
 
     # Если значение осталось бесконечностью, значит сумму собрать нельзя
-    return dp[x] if dp[x] != float('inf') else -1
+    return dp[x] if dp[x] != float("inf") else -1
 
 
 if __name__ == "__main__":
