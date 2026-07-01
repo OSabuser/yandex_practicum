@@ -1,4 +1,4 @@
-# ССЫЛКА НА ОТЧЁТ:
+# ССЫЛКА НА ОТЧЁТ: https://contest.yandex.ru/contest/26133/run-report/163442020/
 #
 # 1. Принцип работы алгоритма
 #
@@ -83,7 +83,7 @@
 
 def decompress(packed_str: str) -> str:
     """
-    Распаковывает строку согласно рекурсивному правилу n[A].
+    Распаковка строки согласно рекурсивному правилу n[A].
     """
     stack = []
     current_str = []
@@ -115,7 +115,7 @@ def get_common_prefix(s1: str, s2: str) -> str:
     Поиск наибольшего общего префикса двух строк.
     """
     match_len = 0
-    for c1, c2 in zip(s1, s2, strict=True):
+    for c1, c2 in zip(s1, s2, strict=False):
         if c1 == c2:
             match_len += 1
         else:
@@ -144,74 +144,3 @@ def show_lcp_of_unpacked_strings():
 
 if __name__ == "__main__":
     show_lcp_of_unpacked_strings()
-
-
-def decompress(packed_str: str) -> str:
-    """
-    Распаковывает строку согласно рекурсивному правилу n[A].
-    """
-    stack = []
-    current_str = []
-    current_num = 0
-
-    for char in packed_str:
-        if char.isdigit():
-            current_num = int(char)
-        elif char == "[":
-            # Кладем текущий контекст в стек и начинаем новый
-            stack.append((current_str, current_num))
-            current_str = []
-            current_num = 0
-        elif char == "]":
-            # Достаем предыдущий контекст
-            prev_str, num = stack.pop()
-            # Расширяем его текущей собранной строкой, повторенной num раз
-            prev_str.extend(current_str * num)
-            current_str = prev_str
-        else:
-            # Обычный символ
-            current_str.append(char)
-
-    return "".join(current_str)
-
-
-def get_common_prefix(s1: str, s2: str) -> str:
-    """
-    Возвращает наибольший общий префикс двух строк.
-    Использует zip для высокой скорости за счет C-API Python.
-    """
-    match_len = 0
-    for c1, c2 in zip(s1, s2):
-        if c1 == c2:
-            match_len += 1
-        else:
-            break
-    return s1[:match_len]
-
-
-def solve():
-    n = int(input().strip())
-
-    if n == 0:
-        print("")
-        return
-
-    # Читаем первую строку и берем ее как базовый префикс
-    first_packed = input().strip()
-    current_lcp = decompress(first_packed)
-
-    # Сравниваем со всеми остальными строками на лету
-    for _ in range(n - 1):
-        next_packed = input().strip()
-
-        # Если префикс уже пустой, мы все равно должны дочитать ввод,
-        # но тяжелые операции распаковки можно пропустить (оптимизация)
-        if current_lcp:
-            decompressed_next = decompress(next_packed)
-            current_lcp = get_common_prefix(current_lcp, decompressed_next)
-
-    print(current_lcp)
-
-
-if __name__ == "__main__":
-    solve()
